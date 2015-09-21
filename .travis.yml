@@ -1,6 +1,13 @@
 language: perl
 sudo: false
 
+cache:
+  directories:
+  - ~/perl5/perlbrew/perls
+
+os:
+  - osx
+
 compiler:
   - clang
   - gcc
@@ -12,16 +19,8 @@ perl:
   - "5.14"
   - "5.12"
 
-install:
-  # Deal with dependencies
-  - cpanm --installdeps --verbose .
-  - cpanm -n Devel::Cover
-  - cpanm -n Devel::Cover::Report::Coveralls
 script:
-  - perl Makefile.PL --profiling
-  - make -j5
-  - HARNESS_PERL_SWITCHES=-MDevel::Cover make test
-  - make install
+  - sh .travis.deps.sh
 after_success:
   - find -name *.gcda -type f -exec gcov-4.8 -abc -o `basename {}` {} \;
   - cover -gcov -report coveralls -ignore_re "^/usr" -ignore_re "^libsass"
